@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: recetabbb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - recetabbb-net
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recetabbb-api
+    depends_on:
+      - mysql
+    ports:
+      - "3000:3000"
+    networks:
+      - recetabbb-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/recetabbb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+volumes:
+  db_data:
+
+networks:
+  recetabbb-net:
+    driver: bridge
